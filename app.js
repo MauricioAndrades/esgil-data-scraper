@@ -5,12 +5,12 @@ var nightmare = Nightmare({
 
 var sites = {};
 sites.cal = "http://www.californiabids.com/";
-sites.nev = "http://www.nevadabids.com/";
-sites.mon = "http://www.montanabids.com/";
-sites.or = "http://www.oregonbids.com";
-sites.wa = "http://www.washingtonbids.com";
-sites.ut = "http://www.utahbids.net";
 sites.id = "http://www.idahobids.com";
+sites.mon = "http://www.montanabids.com/";
+sites.nev = "http://www.nevadabids.com/";
+sites.or = "http://www.oregonbids.com";
+sites.ut = "http://www.utahbids.net";
+sites.wa = "http://www.washingtonbids.com";
 
 var keywords = [
 	"building department",
@@ -24,7 +24,7 @@ var keywords = [
 ];
 
 nightmare
-	.goto(sites[0])
+	.goto(sites.cal)
 	.wait('#main')
 	.end()
 	.then(function(result) {
@@ -33,3 +33,5 @@ nightmare
 	.catch(function(e) {
 		console.error(e)
 	})
+
+console.log(sites);
