@@ -3,15 +3,14 @@ var nightmare = Nightmare({
 	show: true
 });
 
-var sites = [
-	"http://www.californiabids.com/",
-	"http://www.nevadabids.com/",
-	"http://www.montanabids.com/",
-	"http://www.oregonbids.com",
-	"http://www.washingtonbids.com",
-	"http://www.utahbids.net",
-	"http://www.idahobids.com"
-];
+var sites = {};
+sites.cal = "http://www.californiabids.com/";
+sites.nev = "http://www.nevadabids.com/";
+sites.mon = "http://www.montanabids.com/";
+sites.or = "http://www.oregonbids.com";
+sites.wa = "http://www.washingtonbids.com";
+sites.ut = "http://www.utahbids.net";
+sites.id = "http://www.idahobids.com";
 
 var keywords = [
 	"building department",
