@@ -70,3 +70,71 @@ function DOMComb(node, callback) {
 
 var merged = [];
 DOMComb(document.querySelector('tbody'), printContent)
+
+
+String.prototype.escapeChar = function(chars) {
+  var foundChar = false;
+  for (var i = 0; i < chars.length; ++i) {
+    if (this.indexOf(chars.charAt(i)) !== -1) {
+      foundChar = true;
+      break;
+    }
+  }
+  if (!foundChar) {
+    return String(this);
+  }
+  var result = '';
+  for (var i = 0; i < this.length; ++i) {
+    if (chars.indexOf(this.charAt(i)) !== -1) {
+      result += '\\';
+    }
+    result += this.charAt(i);
+  }
+  return result;
+};
+
+String.regexSpecialChar = function() {
+  return '^[]{}()\\.^$*+?|-,';
+};
+
+String.prototype.escapeForRegExp = function() {
+  return this.escapeChar(String.regexSpecialChar());
+};
+
+String.prototype.escapeHTML = function() {
+  return this.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+};
+
+function makeSearchRegex(query, flags) {
+  var regexSpecialChar = String.regexSpecialChar();
+  var regex = '';
+  for (var i = 0; i < query.length; ++i) {
+    var c = query.charAt(i);
+    if (regexSpecialChar.indexOf(c) != -1)
+      regex += '\\';
+    regex += c;
+  }
+  return new RegExp(regex, flags || '');
+}
+
+
+function matchInArray(regex_obj, arr) {
+  var match_arr = [];
+  var oRegex = new RegExp(regex_obj);
+  for (var i = 0; i < arr.length; i++) {
+    var found = String(arr[i]).search(oRegex);
+    if (found > -1) {
+      match_arr.push(arr[i]);
+    }
+  }
+  return match_arr
+}
+
+function regexSearch(arr, regularExpression) {
+  return false;
+}
+
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  // $& means the whole matched string
+}
