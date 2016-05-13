@@ -12,6 +12,7 @@
   "author": "Mauricio Andrades <mauricioandades@yahoo.com>",
   "license": "ISC",
   "dependencies": {
-    "nightmare": "^2.4.0"
+    "nightmare": "^2.4.0",
+    "underscore": "^1.8.3"
   }
 }

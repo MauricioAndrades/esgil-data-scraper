@@ -1,7 +1,9 @@
 var Nightmare = require('nightmare');
 var nightmare = Nightmare({
+	openDevtools: true,
 	show: true
 });
+var _ = require('underscore');
 var getCSS = require('getcss');
 
 // key sites to target
@@ -26,20 +28,15 @@ var keywords = [
 	'plan review'
 ];
 
-// csstags
-var tags = [];
-var selector = window.document.querySelector('body');
-var options = {
-	simple: false
-}
-
-getCss.getTags(selector, tags, options);
-
-console.log(tags);
+// document.querySelector('tbody').innerText
+// non breaking space '\u00a0'
+var selector = 'tbody';
 
 nightmare
 	.goto(sites.cal)
-	.wait('#main')
+	.evaluate(function(selector) {
+		return document.querySelector(selector).innerText;
+	}, selector)
 	.end()
 	.then(function(result) {
 		console.log(result)
