@@ -36,14 +36,37 @@ $('tbody').children().each(function() {
   }
 });
 
+var mergedArray = [];
 
 function mergeArray(array) {
   var i = 0;
   var j = 0;
-  for (i; i < array.length; i += 2, j++) {
-    mergedArray[j] = array[i] + ' - ' + array[i + 1];
+  for (i; i < array.length; i += 8, j++) {
+    mergedArray[j] = array[i].trim() + ' - ' + array[i + 1].trim() + ' - ' + array[i + 2].trim() +
+      '-' + array[i + 3].trim() + '-' + array[i + 4].trim();
   }
   return mergedArray;
 }
 
-mergeArray(arr);
+mergeArray(merged);
+
+
+function printContent() {
+  if (this.nodeValue) {
+    merged.push(this.nodeValue);
+  }
+}
+
+function DOMComb(node, callback) {
+  if (node.hasChildNodes()) {
+    for (var node = node.firstChild; node; node = node.nextSibling) {
+      DOMComb(node, callback);
+    }
+  }
+  callback.call(node);
+}
+
+
+
+var merged = [];
+DOMComb(document.querySelector('tbody'), printContent)
