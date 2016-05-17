@@ -17,13 +17,66 @@ sites.or = 'http://www.oregonbids.com';
 sites.ut = 'http://www.utahbids.net';
 sites.wa = 'http://www.washingtonbids.com';
 
-var urls = [];
+var gProps = {
+	oEnum: function(obj) {
+		return this._getPropertyNames(obj, true, false, this._enumerable);
+	},
+	oNEnum: function(obj) {
+		return this._getPropertyNames(obj, true, false, this._notEnumerable);
+	},
+	oBoth: function(obj) {
+		return this._getPropertyNames(obj, true, false, this._enumerableAndNotEnumerable);
+		// Or just use: return Object.getOwnPropertyNames(obj);
+	},
+	pEnum: function(obj) {
+		return this._getPropertyNames(obj, false, true, this._enumerable);
+	},
+	pNEnum: function(obj) {
+		return this._getPropertyNames(obj, false, true, this._notEnumerable);
+	},
+	pBoth: function(obj) {
+		return this._getPropertyNames(obj, false, true, this._enumerableAndNotEnumerable);
+	},
+	opEnum: function(obj) {
+		return this._getPropertyNames(obj, true, true, this._enumerable);
+		// Or could use unfiltered for..in
+	},
+	opNEnum: function(obj) {
+		return this._getPropertyNames(obj, true, true, this._notEnumerable);
+	},
+	opBoth: function(obj) {
+		return this._getPropertyNames(obj, true, true, this._enumerableAndNotEnumerable);
+	},
+	_enumerable: function(obj, prop) {
+		return obj.propertyIsEnumerable(prop);
+	},
+	_notEnumerable: function(obj, prop) {
+		return !obj.propertyIsEnumerable(prop);
+	},
+	_enumerableAndNotEnumerable: function(obj, prop) {
+		return true;
+	},
+	_getPropertyNames: function getAllPropertyNames(obj, iterateSelfBool, iteratePrototypeBool, includePropCb) {
+		var props = [];
 
-for (var key in sites) {
-	urls.push(sites[key]);
+		do {
+			if (iterateSelfBool) {
+				Object.getOwnPropertyNames(obj).forEach(function(prop) {
+					if (props.indexOf(prop) === -1 && includePropCb(obj, prop)) {
+						props.push(prop);
+					}
+				})
+			}
+			if (!iteratePrototypeBool) {
+				break;
+			}
+			iterateSelfBool = true;
+		} while (obj = Object.getPrototypeOf(obj))
+		return props;
+	}
+};
 
-}
-
+var urls = Object.values(sites);
 // the keywords we search for
 var keywords = [
 	'building department',
@@ -46,7 +99,9 @@ urls.reduce(function(accumulator, url) {
 	return accumulator.then(function(results) {
 		return nightmare.goto(url)
 			.wait('body')
-			.title()
+			.evaluate(function(result) {
+				return document.querySelector('tbody').innerText;
+			})
 			.then(function(result) {
 				results.push(result);
 				return results;
