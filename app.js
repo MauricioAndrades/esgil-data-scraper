@@ -1,11 +1,14 @@
-var Nightmare = require('nightmare');
-var nightmare = Nightmare({
+// var Nightmare = require('nightmare');
+/*var nightmare = Nightmare({
   openDevtools: false,
   show: true
-});
+});*/
 var _ = require('underscore');
 var async = require('async');
-var spork = require('spork');
+var requireg = require('node-clean-exit');
+var rp = require('request-promise');
+var fs = require('fs');
+
 
 // key sites to target
 var sites = {};
@@ -31,12 +34,25 @@ var keywords = [
 ];
 // document.querySelector('tbody').innerText
 // non breaking space '\u00a0'
-var selector = 'tbody';
-var arr = [];
-var merged = [];
-var match_arr = [];
+var cheerio = require('cheerio'); // Basically jQuery for node.js
 
-urls.reduce(function(accumulator, url) {
+var options = {
+    uri: 'http://www.californiabids.com/',
+    transform: function (body) {
+        return cheerio.load(body);
+    }
+};
+
+rp(options)
+    .then(function ($) {
+        var html = $('tbody').html();
+        console.log(html);
+    })
+    .catch(function (err) {
+        console.log('failed');
+    });
+
+/*urls.reduce(function(accumulator, url) {
   return accumulator.then(function(results) {
     return nightmare.goto(url)
       .wait('body')
@@ -50,45 +66,46 @@ urls.reduce(function(accumulator, url) {
   });
 }, Promise.resolve([])).then(function(results) {
   console.dir(results);
-});
+});*/
 
 // nightmare
-//  .goto(sites.wa)
-//  .evaluate(function(selector, arr, merged, match_arr) {
+//   .goto(sites.wa)
+//   .evaluate(function(selector, arr, merged, match_arr) {
 
-//    $(selector).children().each(function() {
-//      if ($(this).text().length > 1) {
-//        arr.push(($(this).text() + ': '));
-//      }
-//    });
+//       $(selector).children().each(function() {
+//         if ($(this).text().length > 1) {
+//           arr.push(($(this).text() + ': '));
+//         }
+//       });
 
-//    function mergeRows(array) {
-//      var i = 0;
-//      var j = 0;
-//      for (i; i < array.length; i += 2,
-//        j++) {
-//        merged[j] = array[i] + array[i + 1];
-//      }
-//    }
+      //    function mergeRows(array) {
+      //      var i = 0;
+      //      var j = 0;
+      //      for (i; i < array.length; i += 2,
+      //        j++) {
+      //        merged[j] = array[i] + array[i + 1];
+      //      }
+      //    }
 
-//    function arr_grep(literal_string, target_array) {
-//      var oRegex = new RegExp(literal_string);
-//      for (var i = 0; i < target_array.length; i++) {
-//        var found = String(target_array[i]).search(oRegex);
-//        if (found > -1) {
-//          match_arr.push(target_array[i]);
-//        }
-//      }
-//    }
+      //    function arr_grep(literal_string, target_array) {
+      //      var oRegex = new RegExp(literal_string);
+      //      for (var i = 0; i < target_array.length; i++) {
+      //        var found = String(target_array[i]).search(oRegex);
+      //        if (found > -1) {
+      //          match_arr.push(target_array[i]);
+      //        }
+      //      }
+      //    }
 
-//    mergeRows(arr);
+      //    mergeRows(arr);
 
-//    arr_grep(/.*building dept.*|.*building deptartment.*|.*plan review.*|.*building plan.*|.*building code.*|.*code compliance.*|.*code review.*|.*plan check.*/ig, merged);
-//  }, selector)
-//  .end()
-//  .then(function(result) {
-//    console.log(result);
-//  })
-//  .catch(function(e) {
-//    console.error(e);
-//  });
+      //    arr_grep(/.*building dept.*|.*building deptartment.*|.*plan review.*|.*building plan.*|.*building code.*|.*code compliance.*|.*code review.*|.*plan check.*/ig, merged);
+      //  }, selector)
+      //  .end()
+      //  .then(function(result) {
+      //    console.log(result);
+      //  })
+      //  .catch(function(e) {
+      //    console.error(e);
+      //  });
+require('node-clean-exit');
