@@ -1,56 +1,61 @@
-// var Nightmare = require('nightmare');
-/*var nightmare = Nightmare({
-  openDevtools: false,
-  show: true
-});*/
+"use strict";
 var _ = require('underscore');
 var async = require('async');
 var requireg = require('node-clean-exit');
-var rp = require('request-promise');
+var Promise = require('bluebird');
 var fs = require('fs');
+var urls = require('./urls.js');
+var keywords = require("./keywords");
+var request = Promise.promisifyAll(require("request"));
+var promises = [];
+var cheerio = require('cheerio');
+for(var i = 0; i < urls.length; i++) {
+  promises.push(request.getAsync(urls[i]))
+}
 
-// key sites to target
-var sites = {};
-sites.cal = 'http://www.californiabids.com/';
-sites.id = 'http://www.idahobids.com';
-sites.mon = 'http://www.montanabids.com/';
-sites.nev = 'http://www.nevadabids.com/';
-sites.or = 'http://www.oregonbids.com';
-sites.ut = 'http://www.utahbids.net';
-sites.wa = 'http://www.washingtonbids.com';
+Promise.all(promises).then(function(){
+  fs.writeFile('./promise-results.json', JSON.stringify(promises), 'utf8', function(){
+    console.log(promises[0])
+  })
+})
 
-var urls = Object.keys(sites);
-// the keywords we search for
-var keywords = [
-  'building department',
-  'building dept',
-  'building plan',
-  'building review',
-  'code compliance',
-  'code review',
-  'plan check',
-  'plan review'
-];
+var cheercheerioLoadPromises = function(data) {
+  var $ = cheerio.load(data);
+  console.log($)
+}
+
+// cheerioLoadPromises("dataParam", function(err, data) {
+//   if (err) console.log(err);
+//   // name
+// });
+
 // document.querySelector('tbody').innerText
 // non breaking space '\u00a0'
-var cheerio = require('cheerio'); // Basically jQuery for node.js
+ // Basically jQuery for node.js
 
-var options = {
-  uri: 'http://www.californiabids.com/',
-  transform: function(body) {
-    return cheerio.load(body);
-  }
-};
-
-rp(options)
-  .then(function($) {
-    var html = $('tbody').html();
-    console.log(html);
+function makecall() {
+  urls.forEach(function(val, index) {
+    console.log(val);
+    var options = {
+      uri: val,
+      transform: function(body) {
+        return cheerio.load(body);
+      }
+    };
+    rp(options)
+      .then(function($) {
+        var html = $('tbody').html();
+        console.log(html);
+      })
+      .catch(function(err) {
+        console.log('failed');
+      });
   })
-  .catch(function(err) {
-    console.log('failed');
-  });
+}
 
+function promisifiedCalls() {
+
+}
 /*urls.reduce(function(accumulator, url) {
   return accumulator.then(function(results) {
     return nightmare.goto(url)
