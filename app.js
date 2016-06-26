@@ -108,4 +108,4 @@ rp(options)
       //  .catch(function(e) {
       //    console.error(e);
       //  });
-require('node-clean-exit');
+require('node-clean-exit')();
