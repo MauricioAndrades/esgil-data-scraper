@@ -9,7 +9,6 @@ var requireg = require('node-clean-exit');
 var rp = require('request-promise');
 var fs = require('fs');
 
-
 // key sites to target
 var sites = {};
 sites.cal = 'http://www.californiabids.com/';
@@ -37,20 +36,20 @@ var keywords = [
 var cheerio = require('cheerio'); // Basically jQuery for node.js
 
 var options = {
-    uri: 'http://www.californiabids.com/',
-    transform: function (body) {
-        return cheerio.load(body);
-    }
+  uri: 'http://www.californiabids.com/',
+  transform: function(body) {
+    return cheerio.load(body);
+  }
 };
 
 rp(options)
-    .then(function ($) {
-        var html = $('tbody').html();
-        console.log(html);
-    })
-    .catch(function (err) {
-        console.log('failed');
-    });
+  .then(function($) {
+    var html = $('tbody').html();
+    console.log(html);
+  })
+  .catch(function(err) {
+    console.log('failed');
+  });
 
 /*urls.reduce(function(accumulator, url) {
   return accumulator.then(function(results) {
@@ -78,34 +77,34 @@ rp(options)
 //         }
 //       });
 
-      //    function mergeRows(array) {
-      //      var i = 0;
-      //      var j = 0;
-      //      for (i; i < array.length; i += 2,
-      //        j++) {
-      //        merged[j] = array[i] + array[i + 1];
-      //      }
-      //    }
+//    function mergeRows(array) {
+//      var i = 0;
+//      var j = 0;
+//      for (i; i < array.length; i += 2,
+//        j++) {
+//        merged[j] = array[i] + array[i + 1];
+//      }
+//    }
 
-      //    function arr_grep(literal_string, target_array) {
-      //      var oRegex = new RegExp(literal_string);
-      //      for (var i = 0; i < target_array.length; i++) {
-      //        var found = String(target_array[i]).search(oRegex);
-      //        if (found > -1) {
-      //          match_arr.push(target_array[i]);
-      //        }
-      //      }
-      //    }
+//    function arr_grep(literal_string, target_array) {
+//      var oRegex = new RegExp(literal_string);
+//      for (var i = 0; i < target_array.length; i++) {
+//        var found = String(target_array[i]).search(oRegex);
+//        if (found > -1) {
+//          match_arr.push(target_array[i]);
+//        }
+//      }
+//    }
 
-      //    mergeRows(arr);
+//    mergeRows(arr);
 
-      //    arr_grep(/.*building dept.*|.*building deptartment.*|.*plan review.*|.*building plan.*|.*building code.*|.*code compliance.*|.*code review.*|.*plan check.*/ig, merged);
-      //  }, selector)
-      //  .end()
-      //  .then(function(result) {
-      //    console.log(result);
-      //  })
-      //  .catch(function(e) {
-      //    console.error(e);
-      //  });
+//    arr_grep(/.*building dept.*|.*building deptartment.*|.*plan review.*|.*building plan.*|.*building code.*|.*code compliance.*|.*code review.*|.*plan check.*/ig, merged);
+//  }, selector)
+//  .end()
+//  .then(function(result) {
+//    console.log(result);
+//  })
+//  .catch(function(e) {
+//    console.error(e);
+//  });
 require('node-clean-exit')();
