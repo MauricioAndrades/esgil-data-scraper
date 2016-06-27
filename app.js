@@ -1,59 +1,47 @@
 "use strict";
-debugger;
 var _ = require('underscore');
 var async = require('async');
-var requireg = require('node-clean-exit');
 var Promise = require('bluebird');
-var fs = require('fs');
+var request = Promise.promisifyAll(require("request"));
+var readFile = Promise.promisify(require("fs").readFile);
+var writeFile = Promise.promisify(require("fs").writeFile);
 var urls = require('./urls.js');
 var keywords = require("./keywords");
-var request = Promise.promisifyAll(require("request"));
 var promises = [];
 var cheerio = require('cheerio');
+var $;
+
+////////////////////
+// start promises //
+////////////////////
+
+/** push promised requests into an array to resolve */
 for (var i = 0; i < urls.length; i++) {
   promises.push(request.getAsync(urls[i]))
 }
 
-Promise.all(promises).then(function() {
-  fs.writeFile('./promise-results.json', JSON.stringify(promises), 'utf8',
-    function() {
-      console.log('done')
-    })
-})
+// Promise.all(Iterable<any>|Promise<Iterable<any>> input) -> Promise
+Promise.all(promises).then(function(data) {
+  return writeFile('./promise.json', data, 'utf8')
+}).then(function() {
+  return readFile('./promise-results.json', 'utf8')
+}).then(function(contents) {
+  var parsed = JSON.parse(contents);
+  for (var i = 0; i < parsed.length; i++) {
+    var $ = cheerio.load(parsed[i]["body"]);
+    console.log($('tbody').text().trim());
+  }
+}).catch(function(err) {
+  if(err) console.log(err);
+});
 
-var cheercheerioLoadPromises = function(data) {
-  var $ = cheerio.load(data);
-  console.log($)
-}
+require('node-clean-exit')();
 
-// cheerioLoadPromises("dataParam", function(err, data) {
-//   if (err) console.log(err);
-//   // name
-// });
 
 // document.querySelector('tbody').innerText
 // non breaking space '\u00a0'
 // Basically jQuery for node.js
 
-function makecall() {
-  urls.forEach(function(val, index) {
-    console.log(val);
-    var options = {
-      uri: val,
-      transform: function(body) {
-        return cheerio.load(body);
-      }
-    };
-    rp(options)
-      .then(function($) {
-        var html = $('tbody').html();
-        console.log(html);
-      })
-      .catch(function(err) {
-        console.log('failed');
-      });
-  })
-}
 
 /*urls.reduce(function(accumulator, url) {
   return accumulator.then(function(results) {
@@ -111,5 +99,3 @@ function makecall() {
 //  .catch(function(e) {
 //    console.error(e);
 //  });
-var exit = require('node-clean-exit');
-exit();
