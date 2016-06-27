@@ -11,7 +11,7 @@ var promises = [];
 var cheerio = require('cheerio');
 var fs = require('fs');
 var $;
-var htmlToJson = require('html-to-json')
+var htmltojson = require('html-to-json')
 
 ////////////////////
 // start promises //
@@ -23,26 +23,6 @@ const cheerio_options = {
   decodeEntities: true
 };
 
-
-var textparser = htmlToJson.createParser(html, {
-    'text': function ($td) {
-      return $td.text();
-    },
-    'href': function ($a) {
-      return $a.attr('href');
-    }
-  });
-
-var linkParser = htmlToJson.createParser(['a[href]', {
-  'text': function ($a) {
-    return $a.text();
-  },
-  'href': function ($a) {
-    return $a.attr('href');
-  }
-}]);
-
-
 /** push promised requests into an array to resolve */
 for (var i = 0; i < urls.length; i++) {
   promises.push(request.getAsync(urls[i]))
@@ -50,31 +30,70 @@ for (var i = 0; i < urls.length; i++) {
 
 // Promise.all(Iterable<any>|Promise<Iterable<any>> input) -> Promise
 Promise.all(promises).then(function(data) {
-return writeFile('./promise.json', data, 'utf8')
+  /** write the file to the disk */
+  return writeFile('./promise.json', data, 'utf8')
 }).then(function() {
-return readFile('./promise-results.json', 'utf8')
+  /** now we have a static asset we can play with */
+  return readFile('./promise-results.json', 'utf8')
 }).then(function(contents) {
-  var parsed = JSON.parse(contents);
-  for (var i = 0; i < parsed.length; i++) {
-    $ = cheerio.load(parsed[i]["body"]);
-    /** html parser */
+    /**
+     * parse the file back to a JSON object
+     */
+    /**
+     * loop through all promises returned and cheerio load the content
+     * @return {[type]}     [description]
+     */
+      var parsed = JSON.parse(contents);
+      var html = cheerio.load(parsed[0]["body"]);
+      var _html = (html.html().toString());
+      console.log(_html)
+    htmltojson.parse(_html, {
+          $row: '.row2',
+          'children': function ($row) {
+            return $row.find('.tbody').text();
+          }
+      }, function(){
+        console.log(_html);
+      })
 
-    /** cheerio */
-    $('tbody').children().each(function() {
-      var $this = $(this);
-      var html = $this.html();
-      var fromparser = makeparser(html);
-      console.log(fromparser);
-      // obj.dueDate = $(this).children().attr("td[data-th*='Date']").text();
-      // obj.location = $(this).children().attr("td[data-th*='Owner ']").text();
-      // obj.title = $(this).children("td[data-th*='Solicitation']").children('a').attr('title');
-      // obj.href = $(this).children("td[data-th*='Solicitation']").children('a').attr('href');
-      // arr.push(obj);
-    })
-  }
-}
+    function parse (html, filter, callback) {
+      var isCheerioObject = typeof html === 'object' && html._root._root;
 
-).catch(function(err) {
+      if (typeof html !== 'string' && !isCheerioObject) {
+        throw new Error('HTML string required');
+      }
+
+      var $ = cheerio.load(html);
+
+      var parseContext = new ParseContext({
+        $: $,
+        $container: isCheerioObject? html: $.root(),
+        filter: filter
+      });
+
+      return callbackify(parseContext.parse(), callback);
+    }
+      // console.log(html);
+      /**
+       * html parser here instead of using cheerio
+       */
+
+      /** cheerio */
+
+      /*$('tbody').children().each(function() {
+        var $this = $(this);
+        var html = $this.html();
+
+        obj.dueDate = $(this).children().attr("td[data-th*='Date']").text();
+        obj.location = $(this).children().attr("td[data-th*='Owner ']").text();
+        obj.title = $(this).children("td[data-th*='Solicitation']").children('a').attr('title');
+        obj.href = $(this).children("td[data-th*='Solicitation']").children('a').attr('href');
+        arr.push(obj);
+      })*/
+
+  }).then(function(table){
+    console.log(table)
+  }).catch(function(err) {
   if (err) console.log(err);
 });
 
@@ -85,16 +104,16 @@ return readFile('./promise-results.json', 'utf8')
   })
 }*/
 
-function cheerioLoadTheme(filedata) {
-  $ = cheerio.load(filedata, cheerio_options);
-  var arr = [];
-  var Divs = function(key) {
-    this[key] = $(this).text();
-  }
-  $('dict').children().each(function() {
-    return new Divs($(this).att)
-  })
-}
+// function cheerioLoadTheme(filedata) {
+//   $ = cheerio.load(filedata, cheerio_options);
+//   var arr = [];
+//   var Divs = function(key) {
+//     this[key] = $(this).text();
+//   }
+//   $('dict').children().each(function() {
+//     return new Divs($(this).att)
+//   })
+// }
 
 // readtheme(cheerioLoadTheme);
 require('node-clean-exit')();
