@@ -1,4 +1,5 @@
 "use strict";
+debugger;
 var _ = require('underscore');
 var async = require('async');
 var requireg = require('node-clean-exit');
@@ -9,14 +10,15 @@ var keywords = require("./keywords");
 var request = Promise.promisifyAll(require("request"));
 var promises = [];
 var cheerio = require('cheerio');
-for(var i = 0; i < urls.length; i++) {
+for (var i = 0; i < urls.length; i++) {
   promises.push(request.getAsync(urls[i]))
 }
 
-Promise.all(promises).then(function(){
-  fs.writeFile('./promise-results.json', JSON.stringify(promises), 'utf8', function(){
-    console.log(promises[0])
-  })
+Promise.all(promises).then(function() {
+  fs.writeFile('./promise-results.json', JSON.stringify(promises), 'utf8',
+    function() {
+      console.log('done')
+    })
 })
 
 var cheercheerioLoadPromises = function(data) {
@@ -31,7 +33,7 @@ var cheercheerioLoadPromises = function(data) {
 
 // document.querySelector('tbody').innerText
 // non breaking space '\u00a0'
- // Basically jQuery for node.js
+// Basically jQuery for node.js
 
 function makecall() {
   urls.forEach(function(val, index) {
@@ -53,9 +55,6 @@ function makecall() {
   })
 }
 
-function promisifiedCalls() {
-
-}
 /*urls.reduce(function(accumulator, url) {
   return accumulator.then(function(results) {
     return nightmare.goto(url)
@@ -112,4 +111,5 @@ function promisifiedCalls() {
 //  .catch(function(e) {
 //    console.error(e);
 //  });
-require('node-clean-exit')();
+var exit = require('node-clean-exit');
+exit();
