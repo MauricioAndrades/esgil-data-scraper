@@ -29,19 +29,17 @@ Promise.all(promises).then(function(data) {
   var parsed = JSON.parse(contents);
   for (var i = 0; i < parsed.length; i++) {
     var $ = cheerio.load(parsed[i]["body"]);
-    console.log($('tbody').text().trim());
+    console.log($('tbody').text().trim()+ $('*').data());
   }
 }).catch(function(err) {
-  if(err) console.log(err);
+  if (err) console.log(err);
 });
 
 require('node-clean-exit')();
 
-
 // document.querySelector('tbody').innerText
 // non breaking space '\u00a0'
 // Basically jQuery for node.js
-
 
 /*urls.reduce(function(accumulator, url) {
   return accumulator.then(function(results) {
@@ -90,12 +88,12 @@ require('node-clean-exit')();
 
 //    mergeRows(arr);
 
-//    arr_grep(/.*building dept.*|.*building deptartment.*|.*plan review.*|.*building plan.*|.*building code.*|.*code compliance.*|.*code review.*|.*plan check.*/ig, merged);
-//  }, selector)
-//  .end()
-//  .then(function(result) {
-//    console.log(result);
-//  })
-//  .catch(function(e) {
-//    console.error(e);
-//  });
+ //   arr_grep(/.*building dept.*|.*building deptartment.*|.*plan review.*|.*building plan.*|.*building code.*|.*code compliance.*|.*code review.*|.*plan check.*/ig, merged);
+ // }, selector)
+ // .end()
+ // .then(function(result) {
+ //   console.log(result);
+ // })
+ // .catch(function(e) {
+ //   console.error(e);
+ // });
