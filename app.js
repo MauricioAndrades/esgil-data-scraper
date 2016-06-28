@@ -21,14 +21,16 @@ var cheerioOptions = {
   decodeEntities: true
 };
 
-var testfind = function(target, destination) {
+var testfind = function(target) {
   var searchpattern = /.*building dept.*|.*building deptartment.*|.*plan review.*|.*building plan.*|.*building code.*|.*code compliance.*|.*code review.*|.*plan check.*/ig
   var oRegex = new RegExp(searchpattern);
-
-  return String(target).search(oRegex);
-  if (found < -1){
-    return true
+  for(var key in target) {
+    var str = target[key];
   }
+  var found = String(target).search(oRegex);
+  if (str.search(re) != -1) {
+    return true
+  } else
   return false;
 }
 
@@ -98,8 +100,10 @@ Promise.all(promises).then(function(data) {
 }).then(function() {
   return readFile('./promise-results.json', 'utf8')
 }).then(function(contents) {
+  debugger;
+
   var parsed = JSON.parse(contents);
-  console.log(parsed.length);
+  // contents arr of objs. [obj, obj, obj, obj, obj] parsed[0].body
   var arr = [];
   var container = {};
 
@@ -109,38 +113,44 @@ Promise.all(promises).then(function(data) {
 
     $('tbody').children().contents().find('td>a').addBack().each(function() {
       arr.push($(this));
-      /*.each(function () {
-                 if (($(this).attr('data-dh')) !== undefined) {
-                   if(($(this).attr('data-dh')) === "Scope: ") {
-                   var _scope = $(this).attr('innerText')
-                   console.log('-------------scopetext'+_scope);
-                   }
-                 arr.push(_scope);
-                 }
-               });*/
+
     });
     var bin = {};
+    var formatted = [];
+    var count = 0;
     for (var i = 0; i < arr.length; i++) {
-      bin[i] = $(arr[i]).text();
+      count += 1;
+      bin[count] = $(arr[i]).text();
       if ($(arr)[i].attr('href') !== undefined) {
-        bin[i] = ($(arr)[i].attr('href'));
+        bin[count] = ($(arr)[i].attr('href'));
+      }
+      if (bin[count] === " ") {
+        formatted.push(bin);
+        bin = {};
+        count = 0;
       }
     }
-    console.log(bin);
-    var accum = [];
-    for (var key in bin) {
+    debugger;
+    for(var i = 0; i < formatted.length; i++) {
+      for (var key in formatted[i]) {
+        if(testfind(formatted[key])){
+          console.log(found);
+          console.log(formatted[key])
+        }
+      }
+    }
 
-      accum.push(bin[key]);
-      if (testfind(bin[key])) {
-        console.log(bin[key])
-      }
-    }
+    /////////////////////////////
+    // keywords match section  //
+    /////////////////////////////
+
+
+
   }
 }).catch(function(err) {
   if (err) console.log(err);
+  require('node-clean-exit')();
 });
-
-require('node-clean-exit')();
 
 // document.querySelector('tbody').innerText
 // non breaking space '\u00a0'
