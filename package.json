@@ -17,11 +17,13 @@
     "byline": "^4.2.1",
     "cheerio": "^0.20.0",
     "html-to-json": "^0.6.0",
+    "mississippi": "^1.2.0",
     "node-clean-exit": "^0.2.1",
     "request": "^2.72.0",
     "request-promise": "^3.0.0",
     "requireg": "^0.1.5",
     "spork": "^0.3.2",
+    "traverse": "^0.6.6",
     "underscore": "^1.8.3",
     "vo": "^3.1.1"
   }

@@ -9,7 +9,79 @@ var urls = require('./urls.js');
 var keywords = require("./keywords");
 var promises = [];
 var cheerio = require('cheerio');
+var traverse = require('traverse');
+var fs = require('fs');
+var Readable = require('stream').Readable;
 var $;
+var masteraccum = [];
+var cheerioOptions = {
+  withDomLvl1: true,
+  normalizeWhitespace: false,
+  xmlMode: false,
+  decodeEntities: true
+};
+
+var testfind = function(target, destination) {
+  var searchpattern = /.*building dept.*|.*building deptartment.*|.*plan review.*|.*building plan.*|.*building code.*|.*code compliance.*|.*code review.*|.*plan check.*/ig
+  var oRegex = new RegExp(searchpattern);
+
+  return String(target).search(oRegex);
+  if (found < -1){
+    return true
+  }
+  return false;
+}
+
+/////////////////////////
+// traverse inspection //
+/////////////////////////
+function scrubobj(obj, callback) {
+  var scrubbed =
+    traverse(obj).map(function(x) {
+      if (this.circular) this.remove();
+    });
+  callback(scrubbed);
+}
+
+function walkobject(obj) {
+  let s = '';
+  let walked =
+    traverse(obj).forEach(function to_s(node) {
+      if (Array.isArray(node)) {
+        this.before(function() {
+          s += '['
+        });
+        this.post(function(child) {
+          if (!child.isLast) s += ',';
+        });
+        this.after(function() {
+          s += ']'
+        });
+      } else if (typeof node == 'object') {
+        this.before(function() {
+          s += '{'
+        });
+        this.pre(function(x, key) {
+          to_s(key);
+          s += ':';
+        });
+        this.post(function(child) {
+          if (!child.isLast) s += ',';
+        });
+        this.after(function() {
+          s += '}'
+        });
+      } else if (typeof node == 'string') {
+        s += '"' + node.toString().replace(/"/g, '\\"') + '"';
+      } else if (typeof node == 'function') {
+        s += 'null';
+      } else {
+        s += node.toString();
+        s += '\n'
+      }
+    });
+  console.log(walked);
+}
 
 ////////////////////
 // start promises //
@@ -27,9 +99,42 @@ Promise.all(promises).then(function(data) {
   return readFile('./promise-results.json', 'utf8')
 }).then(function(contents) {
   var parsed = JSON.parse(contents);
-  for (var i = 0; i < parsed.length; i++) {
+  console.log(parsed.length);
+  var arr = [];
+  var container = {};
+
+  for (var i = 0; i <= parsed.length; i++) {
     var $ = cheerio.load(parsed[i]["body"]);
-    console.log($('tbody').text().trim()+ $('*').data());
+    // console.log($('tbody').contents().html())
+
+    $('tbody').children().contents().find('td>a').addBack().each(function() {
+      arr.push($(this));
+      /*.each(function () {
+                 if (($(this).attr('data-dh')) !== undefined) {
+                   if(($(this).attr('data-dh')) === "Scope: ") {
+                   var _scope = $(this).attr('innerText')
+                   console.log('-------------scopetext'+_scope);
+                   }
+                 arr.push(_scope);
+                 }
+               });*/
+    });
+    var bin = {};
+    for (var i = 0; i < arr.length; i++) {
+      bin[i] = $(arr[i]).text();
+      if ($(arr)[i].attr('href') !== undefined) {
+        bin[i] = ($(arr)[i].attr('href'));
+      }
+    }
+    console.log(bin);
+    var accum = [];
+    for (var key in bin) {
+
+      accum.push(bin[key]);
+      if (testfind(bin[key])) {
+        console.log(bin[key])
+      }
+    }
   }
 }).catch(function(err) {
   if (err) console.log(err);
@@ -88,12 +193,12 @@ require('node-clean-exit')();
 
 //    mergeRows(arr);
 
- //   arr_grep(/.*building dept.*|.*building deptartment.*|.*plan review.*|.*building plan.*|.*building code.*|.*code compliance.*|.*code review.*|.*plan check.*/ig, merged);
- // }, selector)
- // .end()
- // .then(function(result) {
- //   console.log(result);
- // })
- // .catch(function(e) {
- //   console.error(e);
- // });
+//   arr_grep(/.*building dept.*|.*building deptartment.*|.*plan review.*|.*building plan.*|.*building code.*|.*code compliance.*|.*code review.*|.*plan check.*/ig, merged);
+// }, selector)
+// .end()
+// .then(function(result) {
+//   console.log(result);
+// })
+// .catch(function(e) {
+//   console.error(e);
+// });
