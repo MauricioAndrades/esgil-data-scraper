@@ -21,6 +21,7 @@ var cheerioOptions = {
     decodeEntities: true
 };
 var global_bin = [];
+var gothere = false;
 
 /////////////////////////// traverse inspection ///////////////////////////
 
@@ -104,7 +105,7 @@ Promise.all(promises).then(function(data) {
      * @return {[type]}                [description]
      */
     function testfind(target) {
-
+        // \b(?<!health)(?! )?plan\b|\bbuilding dept\b|\bbuilding plan\b|\bdepartment \b(?!of)\b|\bcode\b|\bplan review\b|\bbuilding.*dept.\b
         var oRegex = new RegExp(/.*building.*|.*building dept.*|.*building department.*|.*plan review.*|.*building plan.*|.*building code.*|.*code compliance.*|.*code review.*|.*plan check.*/mig);
 
         var found = String(target[i]).search(oRegex);
@@ -135,7 +136,7 @@ Promise.all(promises).then(function(data) {
             });
 
         ///////////////////// extract data from arr of dom elements /////////////////////
-debugger;
+
         /** loop through array of cheerio objs and pull out the properties we want from td */
         for (var x = 0; x < arr.length; x++) {
             count += 1;
@@ -162,10 +163,16 @@ debugger;
             }
         }
     }
-}).catch(function(err) {
+}).then(function(){
+    gothere = true;
+    console.log(global_bin.length);
+    fs.writeFile('./global-bin.json', JSON.stringify(global_bin), 'utf8');
+}).catch((function(err) {
     if (err) console.log(err);
-});
+}));
 
+
+    fs.writeFileSync('./global-bin-gothere.json', JSON.stringify(global_bin), 'utf8');
 require('node-clean-exit')();
 // document.querySelector('tbody').innerText
 // non breaking space '\u00a0'
