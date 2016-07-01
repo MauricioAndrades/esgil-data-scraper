@@ -103,7 +103,7 @@ Promise.all(promises).then(function(data) {
      */
     function testfind(target) {
         // target is equiv to a td row.
-        var oRegex = new RegExp(/.*building dept.*|.*building department.*|.*plan review.*|.*building plan.*|.*building code.*|.*code compliance.*|.*code review.*|.*plan check.*/mig);
+        var oRegex = new RegExp(/.*checking plans.*|.*building dept.*|.*building department.*|.*plan review.*|.*building plan.*|.*building code.*|.*code compliance.*|.*code review.*|.*plan check.*/mig);
 
         var found = false;
 
@@ -162,13 +162,16 @@ Promise.all(promises).then(function(data) {
     });
 }).then(function() {
     if (global_match.length > 0) {
-        console.log('matches found!');
+        console.log('matches found!')
         return writeFile('./global-match.json', JSON.stringify(lodash.uniqWith(global_match, lodash.isEqual)), 'utf8');
-    } else {
-        console.log('no matches found');
     }
 }).catch((function(err) {
-    if (err) console.log(err);
+    if (err) {
+        console.log(err);
+        process.nextTick(function() {
+            process.exit(0);
+        })
+    }
 }));
 
-require('node-clean-exit')();
+// require('node-clean-exit')();
