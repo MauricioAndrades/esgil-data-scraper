@@ -81,7 +81,7 @@ for (var i = 0; i < urls.length; i++) {
 
 // Promise.all(Iterable<any>|Promise<Iterable<any>> input) -> Promise
 Promise.all(promises).then(function(data) {
-    return writeFile('./promise.json', data, 'utf8')
+    return writeFile('./promise-results.json', JSON.stringify(data), 'utf8');
 }).then(function() {
     return readFile('./promise-results.json', 'utf8')
 }).then(function(contents) {
