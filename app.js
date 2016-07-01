@@ -1,19 +1,18 @@
 "use strict";
 var _ = require('underscore');
-var async = require('async');
 var Promise = require('bluebird');
 var request = Promise.promisifyAll(require("request"));
 var readFile = Promise.promisify(require("fs").readFile);
 var writeFile = Promise.promisify(require("fs").writeFile);
-var urls = require('./urls.js');
-var keywords = require("./keywords");
-var promises = [];
 var cheerio = require('cheerio');
 var traverse = require('traverse');
 var fs = require('fs');
 var Readable = require('stream').Readable;
 var lodash = require('lodash');
 var $;
+var urls = require('./urls.js');
+var keywords = require("./keywords");
+var promises = [];
 var cheerioOptions = {
     withDomLvl1: true,
     normalizeWhitespace: false,
