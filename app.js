@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 var _ = require('underscore');
 var Promise = require('bluebird');
-var request = Promise.promisifyAll(require("request"));
-var readFile = Promise.promisify(require("fs").readFile);
-var writeFile = Promise.promisify(require("fs").writeFile);
+var request = Promise.promisifyAll(require('request'));
+var readFile = Promise.promisify(require('fs').readFile);
+var writeFile = Promise.promisify(require('fs').writeFile);
 var cheerio = require('cheerio');
 var traverse = require('traverse');
 var fs = require('fs');
@@ -11,7 +11,7 @@ var Readable = require('stream').Readable;
 var lodash = require('lodash');
 var $;
 var urls = require('./urls.js');
-var keywords = require("./keywords");
+var keywords = require('./keywords');
 var promises = [];
 var cheerioOptions = {
     withDomLvl1: true,
@@ -38,17 +38,17 @@ function walkobject(obj) {
         traverse(obj).forEach(function to_s(node) {
             if (Array.isArray(node)) {
                 this.before(function() {
-                    s += '['
+                    s += '[';
                 });
                 this.post(function(child) {
                     if (!child.isLast) s += ',';
                 });
                 this.after(function() {
-                    s += ']'
+                    s += ']';
                 });
             } else if (typeof node == 'object') {
                 this.before(function() {
-                    s += '{'
+                    s += '{';
                 });
                 this.pre(function(x, key) {
                     to_s(key);
@@ -58,7 +58,7 @@ function walkobject(obj) {
                     if (!child.isLast) s += ',';
                 });
                 this.after(function() {
-                    s += '}'
+                    s += '}';
                 });
             } else if (typeof node == 'string') {
                 s += '"' + node.toString().replace(/"/g, '\\"') + '"';
@@ -66,7 +66,7 @@ function walkobject(obj) {
                 s += 'null';
             } else {
                 s += node.toString();
-                s += '\n'
+                s += '\n';
             }
         });
     console.log(walked);
@@ -76,14 +76,14 @@ function walkobject(obj) {
 
 /** push promised requests into an array to resolve */
 for (var i = 0; i < urls.length; i++) {
-    promises.push(request.getAsync(urls[i]))
+    promises.push(request.getAsync(urls[i]));
 }
 
 // Promise.all(Iterable<any>|Promise<Iterable<any>> input) -> Promise
 Promise.all(promises).then(function(data) {
     return writeFile('./promise-results.json', JSON.stringify(data), 'utf8');
 }).then(function() {
-    return readFile('./promise-results.json', 'utf8')
+    return readFile('./promise-results.json', 'utf8');
 }).then(function(contents) {
 
     var parsed = JSON.parse(contents);
@@ -121,7 +121,7 @@ Promise.all(promises).then(function(data) {
     /** for each obj in the full collection read from file */
     for (var j = 0; j < parsed.length; j++) {
 
-        $ = cheerio.load(parsed[j]["body"]);
+        $ = cheerio.load(parsed[j]['body']);
 
         /**
          * cheerio parse table body
@@ -144,7 +144,7 @@ Promise.all(promises).then(function(data) {
             }
 
             /** reset on empty object key === separator line */
-            if (_bin[count] === " ") {
+            if (_bin[count] === ' ') {
                 global_bin.push(_bin);
                 _bin = {};
                 count = 0;
@@ -161,7 +161,7 @@ Promise.all(promises).then(function(data) {
     });
 }).then(function() {
     if (global_match.length > 0) {
-        console.log('matches found!')
+        console.log('matches found!');
         return writeFile('./global-match.json', JSON.stringify(lodash.uniqWith(global_match, lodash.isEqual)), 'utf8');
     }
 }).catch((function(err) {
@@ -169,7 +169,7 @@ Promise.all(promises).then(function(data) {
         console.log(err);
         process.nextTick(function() {
             process.exit(0);
-        })
+        });
     }
 }));
 
