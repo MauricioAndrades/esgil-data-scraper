@@ -12,8 +12,8 @@ var cheerio = require('cheerio');
 var traverse = require('traverse');
 var fs = require('fs');
 var Readable = require('stream').Readable;
+var lodash = require('lodash');
 var $;
-var masteraccum = [];
 var cheerioOptions = {
     withDomLvl1: true,
     normalizeWhitespace: false,
@@ -21,7 +21,7 @@ var cheerioOptions = {
     decodeEntities: true
 };
 var global_bin = [];
-var gothere = false;
+var global_match = [];
 
 /////////////////////////// traverse inspection ///////////////////////////
 
@@ -88,33 +88,32 @@ Promise.all(promises).then(function(data) {
 }).then(function(contents) {
 
     var parsed = JSON.parse(contents);
-    
+
     /** @type {Object} local place to create objs before pushing them */
     var _bin = {};
-    
+
     /** @type {Number} local count to assemble objects */
     var count = 0;
 
     /** the results from cheerio parsing */
     var arr = [];
-    
+
     /**
      * grep through keys, find matches
-     * @param  {[type]} literal_string [description]
-     * @param  {[type]} target_array   [description]
-     * @return {[type]}                [description]
      */
     function testfind(target) {
-        // \b(?<!health)(?! )?plan\b|\bbuilding dept\b|\bbuilding plan\b|\bdepartment \b(?!of)\b|\bcode\b|\bplan review\b|\bbuilding.*dept.\b
-        var oRegex = new RegExp(/.*building.*|.*building dept.*|.*building department.*|.*plan review.*|.*building plan.*|.*building code.*|.*code compliance.*|.*code review.*|.*plan check.*/mig);
+        // target is equiv to a td row.
+        var oRegex = new RegExp(/.*building dept.*|.*building department.*|.*plan review.*|.*building plan.*|.*building code.*|.*code compliance.*|.*code review.*|.*plan check.*/mig);
 
-        var found = String(target[i]).search(oRegex);
+        var found = false;
 
-        if (found > -1) {
-            // match_arr.push(target[i]);
-            return true;
+        /** target[key] is one string of a child of td */
+        for (var key in target) {
+            found = String(target[key]).search(oRegex);
+            if (found > -1) {
+                return true;
+            }
         }
-
         return false;
     }
 
@@ -152,85 +151,24 @@ Promise.all(promises).then(function(data) {
                 count = 0;
             }
         }
-
-        /** check the objects for matched keys */
-        for (var k = 0; k < global_bin.length; k++) {
-            for (var key in global_bin[k]) {
-                //////////////////////////////////// insert test find logic here
-                if (testfind(global_bin[key]) === true) {
-                    console.log(global_bin[key]);
-                }
-            }
-        }
     }
-}).then(function(){
-    gothere = true;
-    console.log(global_bin.length);
-    fs.writeFile('./global-bin.json', JSON.stringify(global_bin), 'utf8');
+    /**
+     * check matches and push them into matches bin if they meet the criteria.
+     */
+    global_bin.forEach(function(el) {
+        if (testfind(el)) {
+            global_match.push(el);
+        }
+    });
+}).then(function() {
+    if (global_match.length > 0) {
+        console.log('matches found!');
+        return writeFile('./global-match.json', JSON.stringify(lodash.uniqWith(global_match, lodash.isEqual)), 'utf8');
+    } else {
+        console.log('no matches found');
+    }
 }).catch((function(err) {
     if (err) console.log(err);
 }));
 
-
-    fs.writeFileSync('./global-bin-gothere.json', JSON.stringify(global_bin), 'utf8');
 require('node-clean-exit')();
-// document.querySelector('tbody').innerText
-// non breaking space '\u00a0'
-// Basically jQuery for node.js
-
-/*urls.reduce(function(accumulator, url) {
-  return accumulator.then(function(results) {
-    return nightmare.goto(url)
-      .wait('body')
-      .evaluate(function(result) {
-        return document.querySelector('tbody').innerText;
-      })
-      .then(function(result) {
-        results.push(result);
-        return results;
-      })
-  });
-}, Promise.resolve([])).then(function(results) {
-  console.dir(results);
-});*/
-
-// nightmare
-//   .goto(sites.wa)
-//   .evaluate(function(selector, arr, merged, match_arr) {
-
-//       $(selector).children().each(function() {
-//         if ($(this).text().length > 1) {
-//           arr.push(($(this).text() + ': '));
-//         }
-//       });
-
-//    function mergeRows(array) {
-//      var i = 0;
-//      var j = 0;
-//      for (i; i < array.length; i += 2,
-//        j++) {
-//        merged[j] = array[i] + array[i + 1];
-//      }
-//    }
-
-//    function arr_grep(literal_string, target_array) {
-//      var oRegex = new RegExp(literal_string);
-//      for (var i = 0; i < target_array.length; i++) {
-//        var found = String(target_array[i]).search(oRegex);
-//        if (found > -1) {
-//          match_arr.push(target_array[i]);
-//        }
-//      }
-//    }
-
-//    mergeRows(arr);
-
-//   arr_grep(/.*building dept.*|.*building deptartment.*|.*plan review.*|.*building plan.*|.*building code.*|.*code compliance.*|.*code review.*|.*plan check.*/ig, merged);
-// }, selector)
-// .end()
-// .then(function(result) {
-//   console.log(result);
-// })
-// .catch(function(e) {
-//   console.error(e);
-// });
