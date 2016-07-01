@@ -172,5 +172,3 @@ Promise.all(promises).then(function(data) {
     });
   }
 }));
-
-// require('node-clean-exit')();
