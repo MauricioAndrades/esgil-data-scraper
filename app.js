@@ -6,10 +6,10 @@ var readFile = Promise.promisify(require('fs').readFile);
 var writeFile = Promise.promisify(require('fs').writeFile);
 var cheerio = require('cheerio');
 var traverse = require('traverse');
-var fs = require('fs');
 var Readable = require('stream').Readable;
 var lodash = require('lodash');
 var $;
+var fs = require('fs');
 var urls = require('./urls.js');
 var keywords = require('./keywords');
 var promises = [];
@@ -46,7 +46,7 @@ function walkobject(obj) {
         this.after(function() {
           s += ']';
         });
-      } else if (typeof node == 'object') {
+      } else if (typeof node === 'object') {
         this.before(function() {
           s += '{';
         });
@@ -60,9 +60,9 @@ function walkobject(obj) {
         this.after(function() {
           s += '}';
         });
-      } else if (typeof node == 'string') {
+      } else if (typeof node === 'string') {
         s += '"' + node.toString().replace(/"/g, '\\"') + '"';
-      } else if (typeof node == 'function') {
+      } else if (typeof node === 'function') {
         s += 'null';
       } else {
         s += node.toString();
