@@ -1,1 +1,6 @@
 dev-bin/**
+global-match.json
+promise-results
+bin/
+.iron-node.js
+urls.js

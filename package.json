@@ -1,7 +1,7 @@
 {
-  "name": "esgil",
+  "name": "data-scraper server example",
   "version": "1.0.0",
-  "description": "esgil data scraper",
+  "description": "data-scraper",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

@@ -1,12 +1,10 @@
 # Data Scraper Example:
 
-Data scraping solution built for the Esgil Corporation. 
+Data scraping server built for client. (server code and some sensitive info removed for security reasons)
 
 The Application uses a series of promised requests to extract
 bid content and find relevant information that is of importance to the
 client. 
-
-Server code has been removed for security reasons. Only scraper is exposed here.
 
 ## Technologies:
 
